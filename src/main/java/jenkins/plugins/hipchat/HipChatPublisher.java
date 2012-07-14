@@ -7,8 +7,8 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
+import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
-import hudson.tasks.Recorder;
 
 import java.util.logging.Logger;
 
@@ -21,7 +21,7 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Hajo Eichler
  */
 @SuppressWarnings("rawtypes")
-public class HipChatPublisher extends Recorder {
+public class HipChatPublisher extends Notifier {
 
     static Logger logger = Logger.getLogger(HipChatPublisher.class.getSimpleName());
 
