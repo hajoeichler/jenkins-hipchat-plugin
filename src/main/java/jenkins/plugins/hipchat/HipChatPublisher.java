@@ -2,24 +2,19 @@ package jenkins.plugins.hipchat;
 
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.model.Build;
 import hudson.model.BuildListener;
+import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
-import hudson.util.FormValidation;
 
-import java.io.IOException;
 import java.util.logging.Logger;
-
-import javax.servlet.ServletException;
 
 import net.sf.json.JSONObject;
 
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -30,7 +25,7 @@ public class HipChatPublisher extends Recorder {
 
     static Logger logger = Logger.getLogger(HipChatPublisher.class.getSimpleName());
 
-    private final String room;
+    public String room;
 
     @DataBoundConstructor
     public HipChatPublisher(String room) {
@@ -47,8 +42,7 @@ public class HipChatPublisher extends Recorder {
     }
 
     @Override
-    public boolean perform(Build build, Launcher launcher, BuildListener listener) throws InterruptedException,
-            IOException {
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) {
         HipChatClient hipChatClient = new HipChatClient();
         hipChatClient.publish(this, new MessageBuilder(this, build).getMessage());
         return true;
@@ -67,14 +61,8 @@ public class HipChatPublisher extends Recorder {
         private String buildServerUrl;
         private String sendAs;
 
-        public FormValidation doCheckName(@QueryParameter String value) throws IOException, ServletException {
-            if (value.length() == 0) {
-                return FormValidation.error("Please set the room");
-            }
-            if (value.length() > 15) {
-                return FormValidation.warning("Isn't the name too short?");
-            }
-            return FormValidation.ok();
+        public DescriptorImpl() {
+            load();
         }
 
         @Override
@@ -84,15 +72,15 @@ public class HipChatPublisher extends Recorder {
 
         @Override
         public String getDisplayName() {
-            return "HipChat Publisher";
+            return "HipChat Notifications";
         }
 
         @Override
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
-            token = formData.getString("hipChatToken");
-            room = formData.getString("hipChatRoom");
-            buildServerUrl = formData.getString("hipChatBuildServerUrl");
-            sendAs = formData.getString("hipChatSendAs");
+            token = formData.getString("token");
+            room = formData.getString("room");
+            buildServerUrl = formData.getString("buildServerUrl");
+            sendAs = formData.getString("sendAs");
             save();
             return super.configure(req, formData);
         }
@@ -112,6 +100,7 @@ public class HipChatPublisher extends Recorder {
         public String getSendAs() {
             return sendAs;
         }
+
     }
 
     public BuildStepMonitor getRequiredMonitorService() {
