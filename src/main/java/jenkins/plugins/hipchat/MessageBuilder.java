@@ -69,9 +69,10 @@ public class MessageBuilder {
             return "green";
         } else if (result == Result.FAILURE) {
             return "red";
-        } else {
+        } else if (result == Result.UNSTABLE) {
             return "yellow";
         }
+        return "purple";
     }
 
     public Message getMessage() {
