@@ -3,6 +3,7 @@ package jenkins.plugins.hipchat;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.BuildListener;
+import hudson.model.Result;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.tasks.BuildStepDescriptor;
@@ -43,9 +44,24 @@ public class HipChatPublisher extends Notifier {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) {
+        Result result = build.getResult();
+        if (result == Result.SUCCESS && getDescriptor().getOnSuccess()) {
+            sendMessage(build);
+        } else if (result == Result.FAILURE) {
+            sendMessage(build);
+        } else if (result == Result.ABORTED) {
+            sendMessage(build);
+        } else if (result == Result.NOT_BUILT) {
+            sendMessage(build);
+        } else if (result == Result.UNSTABLE) {
+            sendMessage(build);
+        }
+        return true;
+    }
+
+    private void sendMessage(AbstractBuild<?, ?> build) {
         HipChatClient hipChatClient = new HipChatClient();
         hipChatClient.publish(this, new MessageBuilder(this, build).getMessage());
-        return true;
     }
 
     @Override
@@ -54,12 +70,14 @@ public class HipChatPublisher extends Notifier {
     }
 
     @Extension
-    public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+    public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
         private String token;
         private String room;
         private String buildServerUrl;
         private String sendAs;
+        private boolean onSuccess;
+        private boolean notifySuccess;
 
         public DescriptorImpl() {
             load();
@@ -81,6 +99,8 @@ public class HipChatPublisher extends Notifier {
             room = formData.getString("room");
             buildServerUrl = formData.getString("buildServerUrl");
             sendAs = formData.getString("sendAs");
+            onSuccess = formData.getBoolean("onSuccess");
+            notifySuccess = formData.getBoolean("notifySuccess");
             save();
             return super.configure(req, formData);
         }
@@ -99,6 +119,14 @@ public class HipChatPublisher extends Notifier {
 
         public String getSendAs() {
             return sendAs;
+        }
+
+        public boolean getOnSuccess() {
+            return onSuccess;
+        }
+
+        public boolean getNotifySuccess() {
+            return notifySuccess;
         }
 
     }

@@ -5,9 +5,10 @@ import hudson.model.AbstractBuild;
 
 @SuppressWarnings("rawtypes")
 public class MessageBuilder {
-    private StringBuffer message;
-    private HipChatPublisher hipChatPublisher;
-    private AbstractBuild build;
+    private final StringBuffer message;
+    private final HipChatPublisher hipChatPublisher;
+    private final AbstractBuild build;
+    private boolean notify = true;
 
     public MessageBuilder(HipChatPublisher hipChatPublisher, AbstractBuild build) {
         this.hipChatPublisher = hipChatPublisher;
@@ -21,11 +22,9 @@ public class MessageBuilder {
     }
 
     private String getStatusMessage() {
-        if (build.isBuilding()) {
-            return "Starting...";
-        }
         Result result = build.getResult();
         if (result == Result.SUCCESS) {
+            notify = hipChatPublisher.getDescriptor().getNotifySuccess();
             return "Success";
         }
         if (result == Result.FAILURE) {
@@ -82,6 +81,6 @@ public class MessageBuilder {
         appendDuration();
         appendOpenLink().toString();
 
-        return new Message(message.toString(), getBuildColor());
+        return new Message(message.toString(), getBuildColor(), notify);
     }
 }

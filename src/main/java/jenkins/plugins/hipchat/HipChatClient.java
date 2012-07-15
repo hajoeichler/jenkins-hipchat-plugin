@@ -25,7 +25,8 @@ public class HipChatClient {
             post.addParameter("room_id", room);
             post.addParameter("message", message.getContent());
             post.addParameter("color", message.getColor());
-            post.addParameter("notify", "1");
+            post.addParameter("notify", message.getNotify());
+
             post.getParams().setContentCharset("UTF-8");
             int status = client.executeMethod(post);
 

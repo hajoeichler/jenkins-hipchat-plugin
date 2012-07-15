@@ -2,12 +2,14 @@ package jenkins.plugins.hipchat;
 
 public class Message {
 
-    private String color;
-    private String content;
+    private final String color;
+    private final String content;
+    private final boolean notify;
 
-    public Message(String content, String color) {
+    public Message(String content, String color, boolean notify) {
         this.content = content;
         this.color = color;
+        this.notify = notify;
     }
 
     public String getColor() {
@@ -18,4 +20,10 @@ public class Message {
         return content;
     }
 
+    public String getNotify() {
+        if (notify) {
+            return "1";
+        }
+        return "0";
+    }
 }
