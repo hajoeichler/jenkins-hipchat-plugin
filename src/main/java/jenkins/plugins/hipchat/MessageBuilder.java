@@ -53,7 +53,8 @@ public class MessageBuilder {
 
     private MessageBuilder appendOpenLink() {
         String url = hipChatPublisher.getDescriptor().getBuildServerUrl() + build.getUrl();
-        message.append(" (<a href='").append(url).append("'>Open</a>)");
+        message.append(" (<a href='").append(url).append("'>Open</a>").append(" <a href='").append(url)
+                .append("/console").append("'>Console</a>)");
         return this;
     }
 
