@@ -11,7 +11,7 @@
     tags they use. Views are always organized according to its owner class,
     so it should be straightforward to find them.
   -->
-<f:section title="Global HipChat Notifier Settings">
+  <f:section title="Global HipChat Notifier Settings">
     <f:entry title="API Token" field="token" help="${rootURL}/plugin/hipchat/help-globalConfig-hipChatToken.html">
         <f:textbox />
     </f:entry>
