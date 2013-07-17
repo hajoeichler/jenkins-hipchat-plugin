@@ -9,9 +9,18 @@ import org.apache.commons.httpclient.methods.PostMethod;
 public class HipChatClient {
 
     static Logger logger = Logger.getLogger(HipChatClient.class.getSimpleName());
+    private final HttpClient httpClient;
+
+    public HipChatClient() {
+        this(new HttpClient());
+    }
+
+    public HipChatClient(HttpClient httpClient) {
+        this.httpClient = httpClient;
+
+    }
 
     public void publish(HipChatPublisher publisher, Message message) {
-        HttpClient client = new HttpClient();
         String url = "https://api.hipchat.com/v1/rooms/message?auth_token=" + publisher.getDescriptor().getToken();
         PostMethod post = new PostMethod(url);
 
@@ -28,7 +37,7 @@ public class HipChatClient {
             post.addParameter("notify", message.getNotify());
 
             post.getParams().setContentCharset("UTF-8");
-            int status = client.executeMethod(post);
+            int status = httpClient.executeMethod(post);
 
             if (status != 200) {
                 logger.log(Level.WARNING, "HipChat post failed. Response: " + post.getResponseBodyAsString());

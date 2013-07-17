@@ -45,16 +45,21 @@ public class HipChatPublisher extends Notifier {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) {
         Result result = build.getResult();
-        if (result == Result.SUCCESS && getDescriptor().getOnSuccess()) {
-            sendMessage(build);
-        } else if (result == Result.FAILURE) {
-            sendMessage(build);
-        } else if (result == Result.ABORTED) {
-            sendMessage(build);
-        } else if (result == Result.NOT_BUILT) {
-            sendMessage(build);
-        } else if (result == Result.UNSTABLE) {
-            sendMessage(build);
+        Result previousResult = Result.NOT_BUILT;
+        try {
+            previousResult = build.getPreviousBuild().getResult();
+        } catch (Exception e) { // ignore
+        }
+        if (getDescriptor().getOnlyOnStateChanges()) {
+            if (result != previousResult) {
+                sendMessage(build);
+            }
+        } else {
+            if (result == Result.SUCCESS && getDescriptor().getOnSuccess()) {
+                sendMessage(build);
+            } else if (result != Result.SUCCESS) {
+                sendMessage(build);
+            }
         }
         return true;
     }
@@ -76,6 +81,7 @@ public class HipChatPublisher extends Notifier {
         private String room;
         private String buildServerUrl;
         private String sendAs;
+        private boolean onlyOnStateChanges;
         private boolean onSuccess;
         private boolean notifySuccess;
 
@@ -99,6 +105,7 @@ public class HipChatPublisher extends Notifier {
             room = formData.getString("room");
             buildServerUrl = formData.getString("buildServerUrl");
             sendAs = formData.getString("sendAs");
+            onlyOnStateChanges = formData.getBoolean("onlyOnStateChanges");
             onSuccess = formData.getBoolean("onSuccess");
             notifySuccess = formData.getBoolean("notifySuccess");
             save();
@@ -123,6 +130,10 @@ public class HipChatPublisher extends Notifier {
 
         public boolean getOnSuccess() {
             return onSuccess;
+        }
+
+        public boolean getOnlyOnStateChanges() {
+            return onlyOnStateChanges;
         }
 
         public boolean getNotifySuccess() {

@@ -51,7 +51,7 @@ public class MessageBuilderTest {
     }
 
     @Test
-    public void testName() throws Exception {
+    public void testMessage() throws Exception {
         createMocks();
         String url = "http://example.com";
         setBuildServerUrl(url);
